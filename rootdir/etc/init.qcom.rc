@@ -77,6 +77,9 @@ on fs
     mkdir /persist/data 0700 system system
     restorecon_recursive /persist
 
+    chown system system  /dev/goodix_fp
+    chmod 0644 /dev/goodix_fp
+
 on boot
     chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
@@ -640,3 +643,9 @@ service fingerprintd /system/bin/fingerprintd
     group drmrpc input system
     socket fpce stream 0660 system system
     writepid /dev/cpuset/system-background/tasks
+
+service gx_fpd /system/bin/gx_fpd
+     class late_start
+     user root
+     group root system
+     writepid /dev/cpuset/system-background/tasks

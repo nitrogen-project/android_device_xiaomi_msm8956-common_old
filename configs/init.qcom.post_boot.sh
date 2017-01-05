@@ -11,3 +11,6 @@
 # Enable governor for perf cluster
  echo 1 > /sys/devices/system/cpu/cpu4/online
  echo "impulse" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+
+# Disable sched_boost
+ echo 0 > /proc/sys/kernel/sched_boost

@@ -252,11 +252,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:system/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
 
-# post_boot script and backup
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/init.qcom.post_boot.sh:system/bin/init.qcom.post_boot.sh \
-    $(LOCAL_PATH)/configs/95-postboot.sh:system/addon.d/95-postboot.sh
-
 # miracast props
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.debug.wfd.enable=1

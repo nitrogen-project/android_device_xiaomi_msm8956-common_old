@@ -1,26 +1,25 @@
-on boot
-    # add a cpuset for the camera daemon
-    # we want all the little cores for camera
-    mkdir /dev/cpuset/camera-daemon
-    write /dev/cpuset/camera-daemon/cpus 0
-    write /dev/cpuset/camera-daemon/mems 0
-    chown system system /dev/cpuset/camera-daemon
-    chown system system /dev/cpuset/camera-daemon/tasks
-    chmod 0664 /dev/cpuset/camera-daemon/tasks
+#!/system/bin/sh
 
-    # Update foreground cpuset now that processors are up
-    # reserve CPU 3 for the top app and camera daemon
-    write /dev/cpuset/foreground/cpus 0-2,4-5
-    write /dev/cpuset/foreground/boost/cpus 4-5
-    write /dev/cpuset/background/cpus 0
-    write /dev/cpuset/system-background/cpus 0-2
-    write /dev/cpuset/top-app/cpus 0-5
-    write /dev/cpuset/camera-daemon/cpus 0-3
+################################################################################
+# helper functions to allow Android init like script
 
-    # Enable sched boost
-    write /proc/sys/kernel/sched_boost 1
+function write() {
+    echo -n $2 > $1
+}
 
-on enable-low-power
+function copy() {
+    cat $1 > $2
+}
+
+function get-set-forall() {
+    for f in $1 ; do
+        cat $f
+        write $f $2
+    done
+}
+
+################################################################################
+
     # HMP scheduler (big.Little cluster related) settings
     write /proc/sys/kernel/sched_boost 0
     write /proc/sys/kernel/sched_upmigrate 95
@@ -59,9 +58,9 @@ on enable-low-power
     write /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate 20000
     write /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq 1305600
     write /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy 0
-    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads "1 691200:80"
+    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads "90"
     write /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time 40000
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 691200
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 400000
 
     # Enable governor for perf cluster
     write /sys/devices/system/cpu/cpu4/online 1
@@ -74,15 +73,8 @@ on enable-low-power
     write /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads "85 1382400:90 1747200:80"
     write /sys/devices/system/cpu/cpu4/cpufreq/interactive/min_sample_time 40000
     write /sys/devices/system/cpu/cpu4/cpufreq/interactive/sampling_down_factor 40000
-    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 883200
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 400000
     write /sys/devices/system/cpu/cpu4/cpufreq/interactive/max_freq_hysteresis 60000
-
-    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay 59000
-    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq 1305600
-    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads "90"
-    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq 1382400
-    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay "19000 1382400:39000"
-    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads "85 1382400:90 1747200:80"
 
     # HMP Task packing settings for 8956
     write /proc/sys/kernel/sched_small_task 30
@@ -121,6 +113,13 @@ on enable-low-power
     write /proc/sys/kernel/sched_freq_dec_notify 50000
 
     # Configure core_ctl
+    write /sys/devices/system/cpu/cpu0/core_ctl/min_cpus 2
+    write /sys/devices/system/cpu/cpu0/core_ctl/max_cpus 4
+    write /sys/devices/system/cpu/cpu0/core_ctl/busy_up_thres 25
+    write /sys/devices/system/cpu/cpu0/core_ctl/busy_down_thres 20
+    write /sys/devices/system/cpu/cpu0/core_ctl/offline_delay_ms 1800
+    write /sys/devices/system/cpu/cpu0/core_ctl/is_big_cluster 0
+    write /sys/devices/system/cpu/cpu0/core_ctl/not_preferred "1 0 0 0"
     write /sys/devices/system/cpu/cpu4/core_ctl/min_cpus 1
     write /sys/devices/system/cpu/cpu4/core_ctl/max_cpus 2
     write /sys/devices/system/cpu/cpu4/core_ctl/busy_up_thres 68
@@ -147,11 +146,6 @@ on enable-low-power
     write /proc/sys/kernel/sched_grp_downmigrate 110
     write /proc/sys/kernel/sched_enable_thread_grouping 1
 
-    # set cpu_boost parameters
-    write /sys/module/cpu_boost/parameters/input_boost_freq "0:1305600"
-    write /sys/module/cpu_boost/parameters/input_boost_ms 40
-    write /proc/sys/kernel/sched_upmigrate_min_nice 15
-
     # set (super) packing parameters
     write /sys/devices/system/cpu/cpu0/sched_mostly_idle_freq 1017600
     write /sys/devices/system/cpu/cpu4/sched_mostly_idle_freq 0
@@ -163,44 +157,5 @@ on enable-low-power
     chmod 0660 /sys/module/lowmemorykiller/parameters/minfree
     write /sys/module/lowmemorykiller/parameters/minfree "14746,18432,22118,25805,40000,55000"
 
-on charger
-    # Disable thermal
-    write /sys/module/msm_thermal/core_control/enabled 0
-
-    # Bring CPUs online
-    write /sys/devices/system/cpu/cpu1/online 1
-    write /sys/devices/system/cpu/cpu2/online 1
-    write /sys/devices/system/cpu/cpu3/online 1
-    write /sys/devices/system/cpu/cpu4/online 1
-    write /sys/devices/system/cpu/cpu5/online 1
-
-    # Configure governor settings for little cluster
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 400000
-
-    # Configure governor settings for big cluster
-    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "powersave"
-    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 400000
-
-    # Bring CPUs offline
-    write /sys/devices/system/cpu/cpu1/online 0
-    write /sys/devices/system/cpu/cpu2/online 0
-    write /sys/devices/system/cpu/cpu3/online 0
-    write /sys/devices/system/cpu/cpu4/online 0
-    write /sys/devices/system/cpu/cpu5/online 0
-
-    # Enable thermal
-    write /sys/module/msm_thermal/core_control/enabled 1
-
-    # Set perfd properties
-    rm /data/system/perfd/default_values
-    start perfd
-
-on class_start:late_start
-    trigger enable-low-power
-
-on property:init.svc.recovery=running
-    trigger enable-low-power
-
-on property:dev.bootcomplete=1
-    setprop sys.io.scheduler "bfq"
+    # Vibrator intensity (max - 3596, min - 116)
+    write /sys/class/timed_output/vibrator/vtg_level 1800

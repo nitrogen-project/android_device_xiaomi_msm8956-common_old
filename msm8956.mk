@@ -216,7 +216,6 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     init.qcom.rc \
-    init.qcom.power.rc \
     init.qcom.usb.rc \
     ueventd.qcom.rc
 
@@ -255,3 +254,7 @@ PRODUCT_COPY_FILES += \
 # miracast props
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.debug.wfd.enable=1
+
+# Power configuration file
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/etc/init.qcom.power.sh:system/bin/init.qcom.power.sh

@@ -17,6 +17,7 @@
 VENDOR_PATH := device/xiaomi/msm8956-common
 
 TARGET_SPECIFIC_HEADER_PATH := $(VENDOR_PATH)/include
+BOARD_GLOBAL_CFLAGS += -DBATTERY_REAL_INFO
 
 # Architecture
 TARGET_ARCH := arm64

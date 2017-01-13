@@ -113,21 +113,21 @@ function get-set-forall() {
     write /proc/sys/kernel/sched_freq_dec_notify 50000
 
     # Configure core_ctl
-    write /sys/devices/system/cpu/cpu0/core_ctl/min_cpus 2
+    write /sys/devices/system/cpu/cpu0/core_ctl/min_cpus 4
     write /sys/devices/system/cpu/cpu0/core_ctl/max_cpus 4
     write /sys/devices/system/cpu/cpu0/core_ctl/busy_up_thres 25
     write /sys/devices/system/cpu/cpu0/core_ctl/busy_down_thres 20
     write /sys/devices/system/cpu/cpu0/core_ctl/offline_delay_ms 1800
     write /sys/devices/system/cpu/cpu0/core_ctl/is_big_cluster 0
-    write /sys/devices/system/cpu/cpu0/core_ctl/not_preferred "1 0 0 0"
-    write /sys/devices/system/cpu/cpu4/core_ctl/min_cpus 1
+#    write /sys/devices/system/cpu/cpu0/core_ctl/not_preferred "1 0 0 0"
+    write /sys/devices/system/cpu/cpu4/core_ctl/min_cpus 2
     write /sys/devices/system/cpu/cpu4/core_ctl/max_cpus 2
     write /sys/devices/system/cpu/cpu4/core_ctl/busy_up_thres 68
     write /sys/devices/system/cpu/cpu4/core_ctl/busy_down_thres 40
     write /sys/devices/system/cpu/cpu4/core_ctl/offline_delay_ms 100
     write /sys/devices/system/cpu/cpu4/core_ctl/task_thres 4
     write /sys/devices/system/cpu/cpu4/core_ctl/is_big_cluster 1
-    write /sys/devices/system/cpu/cpu4/core_ctl/not_preferred "1 0"
+#    write /sys/devices/system/cpu/cpu4/core_ctl/not_preferred "1 0"
 
     # msm_perfomance
     write /sys/module/msm_performance/parameters/touchboost 0

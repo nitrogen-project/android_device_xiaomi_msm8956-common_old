@@ -258,3 +258,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Power configuration file
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.power.sh:system/bin/init.qcom.power.sh
+
+PRODUCT_PACKAGES += \
+    charger_res_images

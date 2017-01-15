@@ -38,8 +38,4 @@
     <!-- Doze: pulse parameter - delay to wait for the screen to wake up after an intent -->
     <integer name="doze_pulse_delay_in_intent">0</integer>
 
-    <!-- Tiles native to System UI. Order should match "quick_settings_tiles_default" -->
-    <string name="quick_settings_tiles_stock" translatable="false">
-        wifi,cell,battery,dnd,flashlight,rotation,bt,airplane,location,hotspot,inversion,saver,work,cast,night,sound,reboot,volume,caffeine,lte,navigation_bar,expanded_desktop,sync,screenshot,lockscreen
-    </string>
 </resources>
